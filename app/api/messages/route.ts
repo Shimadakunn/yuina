@@ -1,14 +1,39 @@
 import { db } from "@/lib/firebase";
-import { addDoc, collection, getDocs, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const beforeTimestamp = searchParams.get("before");
+
     const messagesRef = collection(db, "messages");
-    const messages = await getDocs(messagesRef);
-    const messagesArray = messages.docs
-      .map((doc) => doc.data())
-      .sort((a, b) => b.timestamp - a.timestamp);
+    const q = query(
+      messagesRef,
+      ...(beforeTimestamp
+        ? [
+            orderBy("timestamp", "desc"),
+            where("timestamp", "<", parseInt(beforeTimestamp)),
+          ]
+        : [orderBy("timestamp", "desc")]),
+      limit(8)
+    );
+    const querySnapshot = await getDocs(q);
+    const messages = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    const messagesArray = messages.reverse();
+
     return NextResponse.json({ messagesArray });
   } catch (error) {
     return NextResponse.json(
