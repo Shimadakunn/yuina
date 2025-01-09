@@ -25,7 +25,7 @@ export async function GET(request: Request) {
             where("timestamp", "<", parseInt(beforeTimestamp)),
           ]
         : [orderBy("timestamp", "desc")]),
-      limit(8)
+      limit(10)
     );
     const querySnapshot = await getDocs(q);
     const messages = querySnapshot.docs.map((doc) => ({

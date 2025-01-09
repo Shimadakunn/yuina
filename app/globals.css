@@ -64,3 +64,17 @@ body {
     @apply text-black;
   }
 }
+
+@font-face {
+  font-family: "Star";
+  src: url("/fonts/star.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Cyber";
+  src: url("/fonts/cyber.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}

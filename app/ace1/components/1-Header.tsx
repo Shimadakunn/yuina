@@ -6,7 +6,7 @@ import { LogOut } from "lucide-react";
 
 export default function Header() {
   return (
-    <div className="flex justify-between items-center px-16 h-full">
+    <div className="flex justify-between items-end pb-4 px-16 h-[8vh]">
       <div className="text-2xl font-black">ユイナ</div>
       <div className="flex items-center gap-4">
         <ConnectButton.Custom>
@@ -44,7 +44,7 @@ export default function Header() {
                   if (!connected) {
                     return (
                       <Button
-                        className="bg-gradient-to-r from-[#F48BC9] to-[#A67AEA] rounded-2xl font-black text-lg px-8 py-5"
+                        className="bg-gradient-to-r from-[#F48BC9] to-[#A67AEA] font-black text-lg px-8 py-5 rounded-[0.68rem]"
                         onClick={openConnectModal}
                         type="button"
                       >

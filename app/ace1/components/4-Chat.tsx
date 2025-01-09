@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Chat } from "@/lib/openai/chat";
+import { motion } from "framer-motion";
 import { Send } from "lucide-react";
 import {
   Dispatch,
@@ -59,24 +60,30 @@ export default function ChatComponent() {
   }, [input, address]);
 
   return (
-    <div className="mx-auto flex flex-col justify-start max-w-[800px] w-full h-[57vh]">
+    <div className=" flex flex-col justify-start max-w-[800px] w-full h-[70vh]">
       <TabBar />
-      <div className="flex flex-col justify-end h-[95%] border-2 border-t-0 border-main rounded-b-3xl bg-gradient-to-b from-[#F48BC9]/5 to-[#A67AEA]/20 backdrop-blur-sm">
-        {messageLoaded ? (
-          <ChatContent
-            messages={messages}
-            setMessages={setMessages}
-            loading={loading}
-          />
-        ) : (
-          <div className="flex justify-center items-center h-full">
-            <div className="text-center text-gray-500 text-2xl animate-pulse">
-              メッセージを読み込んでいます...
-            </div>
-          </div>
-        )}
-        <Input input={input} setInput={setInput} sendMessage={sendMessage} />
-      </div>
+      <motion.div
+        className="flex flex-col justify-end border-2 border-t-0 border-main rounded-b-3xl bg-gradient-to-b from-[#F48BC9]/10 to-[#A67AEA]/20 backdrop-blur-sm"
+        animate={{
+          height: messageLoaded ? "95%" : "17%",
+        }}
+        transition={{
+          duration: 0.5,
+          ease: "easeOut",
+        }}
+      >
+        <ChatContent
+          messages={messages}
+          setMessages={setMessages}
+          loading={loading}
+        />
+        <Input
+          input={input}
+          setInput={setInput}
+          sendMessage={sendMessage}
+          loading={loading}
+        />
+      </motion.div>
     </div>
   );
 }
@@ -133,7 +140,7 @@ function ChatContent({
     async (e: React.UIEvent<HTMLDivElement>) => {
       const div = e.currentTarget;
       const isAtRelativeTop =
-        Math.abs(-div.scrollTop + div.clientHeight - div.scrollHeight) < 1;
+        Math.abs(-div.scrollTop + div.clientHeight - div.scrollHeight) <= 1;
       if (isAtRelativeTop && !fetchingMore && !allMessagesLoaded) {
         console.log("fetching more");
         setFetchingMore(true);
@@ -176,7 +183,7 @@ function ChatContent({
     <div
       ref={scrollRef}
       onScroll={handleScroll}
-      className="h-full overflow-y-auto p-4 space-y-4 flex flex-col-reverse"
+      className="overflow-y-auto p-4 space-y-4 flex flex-col-reverse"
     >
       {loading && (
         <div className="flex justify-start">
@@ -201,10 +208,16 @@ function ChatContent({
               message.role === "user" ? "flex-row-reverse" : "flex-row"
             }`}
           >
-            {message.role === "user" && (
+            {message.role === "user" ? (
               <img
                 src={`https://api.dicebear.com/9.x/identicon/svg?seed=${message.walletAddress}`}
                 alt="avatar"
+                className="rounded-full w-6 h-6"
+              />
+            ) : (
+              <img
+                src="./yuina.png"
+                alt="Yuina"
                 className="rounded-full w-6 h-6"
               />
             )}
@@ -244,10 +257,12 @@ function Input({
   input,
   setInput,
   sendMessage,
+  loading,
 }: {
   input: string;
   setInput: (input: string) => void;
   sendMessage: (message: string) => void;
+  loading: boolean;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { isConnected } = useAccount();
@@ -259,13 +274,15 @@ function Input({
         rows={1}
         placeholder={
           isConnected
-            ? "メッセージを入力してください"
+            ? loading
+              ? "AIが応答を生成中..."
+              : "メッセージを入力してください"
             : "ウォレットを接続してチャットを始めましょう"
         }
         className="w-full border-none resize-none overflow-y-auto py-3 max-h-[120px] focus:outline-none bg-gray-100 disabled:cursor-not-allowed"
         style={{ minHeight: "44px" }}
         value={input}
-        disabled={!isConnected}
+        disabled={!isConnected || loading}
         onChange={(e) => {
           const textarea = e.target;
           textarea.style.height = "auto";
@@ -281,10 +298,10 @@ function Input({
       />
       <Button
         size="icon"
-        className="rounded-full h-9 w-9 flex-shrink-0 mb-[6px] border-none hover:scale-110 transition-all duration-300"
+        className="rounded-full h-9 w-9 flex-shrink-0 mb-[6px] border-none hover:scale-110 transition-all duration-300 bg-gradient-to-r from-[#F48BC9] to-[#A67AEA]"
         variant="noShadow"
         onClick={() => sendMessage(input)}
-        disabled={!isConnected}
+        disabled={!isConnected || loading}
       >
         <Send />
       </Button>

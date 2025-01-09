@@ -26,19 +26,20 @@ export default function Prizes() {
   }, []);
 
   return (
-    <div className="mx-auto flex justify-between max-w-[850px] w-full relative">
+    <div className="mx-auto flex justify-between max-w-[850px] w-full relative h-[17vh]">
       <div className="flex flex-col items-start justify-center">
         <p className="text-xl font-bold text-gray-500">残り時間</p>
-        <p className="text-4xl font-black">{messageNumber}</p>
+        <p className="text-4xl font-black font-[Star]">{messageNumber}</p>
       </div>
       <div className="flex flex-col items-center justify-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         <p className="text-xl font-bold text-gray-500">賞金池</p>
-        <p className="text-5xl font-black">$4569</p>
+        <p className="text-5xl font-black font-[Star]">$45690</p>
       </div>
       <div className="flex flex-col items-end justify-center">
         <p className="text-xl font-bold text-gray-500">メッセージ料金</p>
-        <p className="text-4xl font-black">
-          {new Date(lastMessageTimestamp).toLocaleString()}
+        <p className="text-4xl font-black font-[Star]">
+          {/* {new Date(lastMessageTimestamp).toLocaleString()} */}
+          100
         </p>
       </div>
     </div>
