@@ -1,7 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { ABI } from "@/lib/const/ABI";
 import { Chat } from "@/lib/openai/chat";
+
 import { motion } from "framer-motion";
 import { Send } from "lucide-react";
 import {
@@ -12,10 +14,12 @@ import {
   useRef,
   useState,
 } from "react";
-import { useAccount } from "wagmi";
+import { keccak256, parseEther, toHex } from "viem";
+import { useAccount, useWalletClient } from "wagmi";
 
 export default function ChatComponent() {
   const { address } = useAccount();
+  const { data: walletClient } = useWalletClient();
   const [messages, setMessages] = useState<
     Array<{
       role: string;
@@ -32,7 +36,6 @@ export default function ChatComponent() {
     async function initializeChat() {
       const response = await fetch("/api/messages");
       const { messagesArray } = await response.json();
-      console.log(messagesArray);
       setMessages(messagesArray);
       setMessageLoaded(true);
     }
@@ -40,24 +43,41 @@ export default function ChatComponent() {
   }, []);
 
   const sendMessage = useCallback(async () => {
-    if (!Chat.instance || !input.trim() || !address) return;
-    setLoading(true);
-    const newMessage = {
-      role: "user",
-      content: input,
-      walletAddress: address,
-      timestamp: Date.now(),
-    };
-    setMessages((prev) => [...prev, newMessage]);
-    setInput("");
+    if (!Chat.instance || !input.trim() || !address || !walletClient) return;
 
-    const response = await Chat.instance.sendMessage(input, address);
-    setLoading(false);
-    setMessages((prev) => [
-      ...prev,
-      { role: "assistant", content: response, timestamp: Date.now() },
-    ]);
-  }, [input, address]);
+    try {
+      const hashedInput = keccak256(toHex(input));
+      const result = await walletClient.writeContract({
+        address: "0x7a39C38105E237447129327Ca071c0eAf47D9460",
+        abi: ABI,
+        functionName: "buyIn",
+        value: parseEther("0.001"),
+        args: [hashedInput],
+      });
+      console.log(result);
+      setLoading(true);
+      const newMessage = {
+        role: "user",
+        content: input,
+        walletAddress: address,
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, newMessage]);
+      setInput("");
+
+      const response = await Chat.instance.sendMessage(input, address);
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: response, timestamp: Date.now() },
+      ]);
+
+      window.dispatchEvent(new Event("messageSent"));
+    } catch (error) {
+      console.error("Contract interaction failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [input, address, walletClient]);
 
   return (
     <div className=" flex flex-col justify-start max-w-[800px] w-full h-[70vh]">
@@ -125,7 +145,6 @@ function ChatContent({
   const [fetchingMore, setFetchingMore] = useState(false);
   const [allMessagesLoaded, setAllMessagesLoaded] = useState(false);
   const isInitialLoad = useRef(true);
-  const anchorHeight = useRef(0);
 
   useEffect(() => {
     // Scroll to bottom only on initial load

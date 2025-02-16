@@ -6,8 +6,8 @@ import { LogOut } from "lucide-react";
 
 export default function Header() {
   return (
-    <div className="flex justify-between items-end pb-4 px-16 h-[8vh]">
-      <div className="text-2xl font-black">ユイナ</div>
+    <div className="flex justify-between items-end pb-2 px-16 h-[8vh]">
+      <div className="text-4xl font-black font-[Cyber]">YUINA</div>
       <div className="flex items-center gap-4">
         <ConnectButton.Custom>
           {({
@@ -67,16 +67,16 @@ export default function Header() {
                   }
 
                   return (
-                    <div className="flex items-center gap-4">
-                      <p className="text-lg font-black">
-                        プレイヤー: {account.displayName}
+                    <div className="flex items-center gap-2">
+                      <p className="text-lg font-black font-[Star]">
+                        {account.displayName}
                       </p>
-                      <p className="text-lg font-black">
+                      {/* <p className="text-lg font-black">
                         お金: {account.displayBalance}
-                      </p>
+                      </p> */}
                       <Button
                         size="icon"
-                        className="rounded-full h-8 w-8 flex-shrink-0 border-none"
+                        className="rounded-full h-8 w-8 flex-shrink-0 border-none bg-[#F48BC9]"
                         variant="noShadow"
                         onClick={openAccountModal}
                       >

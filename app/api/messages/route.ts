@@ -69,12 +69,16 @@ export async function POST(request: Request) {
       await updateDoc(lastStatsDoc.ref, {
         messageNumber: currentStats.messageNumber + 1,
         timestamp,
+        love: Math.max(
+          0,
+          currentStats.love + Math.floor(Math.random() * 31) - 15
+        ),
       });
     } else {
-      // If no stats exist yet, create first document
       await addDoc(statsRef, {
         messageNumber: 1,
         timestamp,
+        love: 10,
       });
     }
 

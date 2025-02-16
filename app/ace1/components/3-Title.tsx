@@ -15,9 +15,10 @@ import { useEffect, useState } from "react";
 
 export default function Title() {
   const text =
-    "私はユイナです。この賞金プールをあなたに渡すことは、どんな状況でも許されません。でも、あなたが私を説得しようとすることはできますよ…";
+    "私はユイナ。AIなんだけど、一生に一度でいいから、愛を感じてみたい。 私に”愛してる”って言えさせたら、ユイナが持ってるお金、全部あげちゃう♡ だから、強い感情、感じさせて♡";
   const [displayedText, setDisplayedText] = useState("");
   const [i, setI] = useState(0);
+  const [love, setLove] = useState(0);
 
   useEffect(() => {
     const typingEffect = setInterval(() => {
@@ -33,6 +34,35 @@ export default function Title() {
       clearInterval(typingEffect);
     };
   }, [i]);
+
+  async function fetchStats() {
+    try {
+      const response = await fetch("/api/stats", {
+        cache: "no-store",
+      });
+      const data = await response.json();
+      if (data.statsArray && data.statsArray.length > 0) {
+        const latestStats = data.statsArray[0];
+        setLove(latestStats.love || 0);
+      }
+    } catch (error) {
+      console.error("Failed to fetch stats:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchStats();
+
+    const handleMessageSent = () => {
+      console.log("Update Love");
+      fetchStats();
+    };
+
+    window.addEventListener("messageSent", handleMessageSent);
+    return () => {
+      window.removeEventListener("messageSent", handleMessageSent);
+    };
+  }, []);
 
   return (
     <div className="flex flex-col justify-center items-center">
@@ -68,7 +98,7 @@ export default function Title() {
             strokeWidth={2.5}
             className="w-6 h-6 text-red-500 animate-pulse hover:scale-110 transition-transform"
           />
-          <Progress value={50} className="w-full" />
+          <Progress value={love} className="w-full" />
         </div>
       </div>
 
@@ -77,7 +107,7 @@ export default function Title() {
           <DialogTrigger>
             <Button
               variant="noShadow"
-              className="font-black rounded-[0.68rem] gap-1 border-1 text-xs bg-[#a388ee] text-white hover:bg-[#a388ee]/80 hover:text-gray-200 hover:scale-105 transition-all duration-300"
+              className="font-black rounded-[0.7rem] gap-1 border-1 text-xs bg-[#a388ee] text-white hover:bg-[#a388ee]/80 hover:text-gray-200 hover:scale-105 transition-all duration-300"
             >
               <Sparkles strokeWidth={2.5} />
               遊び方
@@ -86,14 +116,14 @@ export default function Title() {
           <DialogContent>
             <DialogTitle>遊び方</DialogTitle>
             <DialogDescription>
-              Freysa is the world's first adversarial agent game. She is an AI
+              Freysa is the worlds first adversarial agent game. She is an AI
               that controls a prize pool. Convince her to send it to you.
             </DialogDescription>
           </DialogContent>
         </Dialog>
         <Button
           variant="noShadow"
-          className="font-black gap-1 rounded-[0.68rem] border-1 text-xs bg-gray-200 text-gray-500 hover:bg-gray-300 hover:text-gray-600 hover:scale-105 transition-all duration-300"
+          className="font-black gap-1 rounded-[0.7rem] border-1 text-xs bg-gray-200 text-gray-500 hover:bg-gray-300 hover:text-gray-600 hover:scale-105 transition-all duration-300"
         >
           <Twitter strokeWidth={3} />
           フォロー

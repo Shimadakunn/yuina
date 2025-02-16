@@ -35,3 +35,11 @@ async function getBalance(wallet: Address) {
   const balance = await publicClient.getBalance({ address: wallet });
   return formatEther(balance);
 }
+
+export async function getPrizePool() {
+  const publicClient = PublicClient();
+  const prizePool = await publicClient.getBalance({
+    address: "0xb3a60b7e3e0cD790a3a6cc1c59627B70e350eea1",
+  });
+  return formatEther(prizePool);
+}

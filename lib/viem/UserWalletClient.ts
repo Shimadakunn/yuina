@@ -1,19 +1,18 @@
-import { createWalletClient, http } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
-import { holesky } from "viem/chains";
+import { useMemo } from "react";
+import { createWalletClient, custom } from "viem";
+import { sepolia } from "viem/chains";
 
 export function UserWalletClient() {
-  if (!process.env.NEXT_PUBLIC_USER_PRIVATE_KEY) {
-    throw new Error("⛔ USER_PRIVATE_KEY environment variable is not set.");
+  if (!window.ethereum) {
+    throw new Error("⛔ MetaMask is not installed.");
   }
 
-  const account = privateKeyToAccount(
-    process.env.NEXT_PUBLIC_USER_PRIVATE_KEY as `0x${string}`
-  );
-
   return createWalletClient({
-    account,
-    chain: holesky,
-    transport: http(),
+    chain: sepolia,
+    transport: custom(window.ethereum!),
   });
+}
+
+export function useUserWalletClient() {
+  return useMemo(() => UserWalletClient(), []);
 }

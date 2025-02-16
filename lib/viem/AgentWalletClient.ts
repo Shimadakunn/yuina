@@ -1,6 +1,6 @@
 import { createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { holesky } from "viem/chains";
+import { sepolia } from "viem/chains";
 
 export function AgentWalletClient() {
   if (!process.env.NEXT_PUBLIC_AGENT_PRIVATE_KEY) {
@@ -13,7 +13,7 @@ export function AgentWalletClient() {
 
   return createWalletClient({
     account,
-    chain: holesky,
+    chain: sepolia,
     transport: http(),
   });
 }
